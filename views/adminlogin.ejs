@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Flaavio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --admin-primary: #6B5B95;
+      --admin-secondary: #D64161;
+      --admin-dark: #2A1E5C;
+      --admin-light: #F7F7FF;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .auth-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .auth-header {
+      background: linear-gradient(135deg, var(--admin-dark), var(--admin-primary));
+      padding: 2rem;
+      text-align: center;
+      color: white;
+    }
+    
+    .auth-title {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+    
+    .auth-body {
+      padding: 2rem;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--admin-dark);
+      font-weight: 500;
+    }
+    
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #eee;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+      border-color: var(--admin-primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(107, 91, 149, 0.2);
+    }
+    
+    .btn-admin {
+      width: 100%;
+      padding: 12px;
+      background: var(--admin-primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1rem;
+    }
+    
+    .btn-admin:hover {
+      background: #5a4a84;
+      transform: translateY(-2px);
+    }
+    
+    .btn-back {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      color: var(--admin-primary);
+      border: 2px solid var(--admin-primary);
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+    }
+    
+    .btn-back:hover {
+      background: var(--admin-primary);
+      color: white;
+    }
+    
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      background-color: #ffebee;
+      color: #c62828;
+    }
+    
+    .admin-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(0,0,0,0.2);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="admin-badge">
+      <i class="fas fa-user-shield"></i> ADMIN
+    </div>
+    
+    <div class="auth-header">
+      <h1 class="auth-title">Admin Login</h1>
+      <p>Restricted Access</p>
+    </div>
+    
+    <div class="auth-body">
+      <% if (message && message.length > 0) { %>
+        <div class="alert"><%= message %></div>
+      <% } %>
+      
+      <form action="/admin/login" method="POST">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        
+        <!-- <div class="form-group">
+          <label for="password">Password(optional)</label>
+          <input type="password" id="password" name="password" class="form-control" >
+        </div> -->
+          <!-- Hidden password field to satisfy passport -->
+  <input type="hidden" name="unused_password" value="dummy">
+        
+        <button type="submit" class="btn-admin">
+          <i class="fas fa-sign-in-alt"></i> Login
+        </button>
+        
+        <a href="/login" class="btn-back">
+          <i class="fas fa-arrow-left"></i> Back to User Login
+        </a>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

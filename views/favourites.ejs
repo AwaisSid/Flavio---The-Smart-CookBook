@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Flaavio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --dark: #292F36;
+            --light: #F7FFF7;
+            --accent: #FFE66D;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            margin-top: 50px;
+            background-color: #f9f9f9;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--secondary);
+            border-radius: 2px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        
+        .recipe-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .recipe-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .recipe-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .recipe-card:hover .recipe-image img {
+            transform: scale(1.05);
+        }
+        
+        .recipe-content {
+            padding: 1.5rem;
+        }
+        
+        .recipe-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+        
+        .recipe-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .recipe-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .recipe-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #e05555;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .favorite-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.9);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 2;
+            border: none;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 5rem 0;
+            grid-column: 1 / -1;
+        }
+        
+        .empty-state i {
+            font-size: 5rem;
+            color: #ddd;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state h2 {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: #999;
+            margin-bottom: 2rem;
+        }
+        
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .tag {
+            background: #f0f0f0;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .nutrition-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .nutrition-badge {
+            background: #f8f8f8;
+            padding: 0.3rem 0.6rem;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .favorites-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', { user: user, currentPage: 'favourites' }) %>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Your Favorite Recipes</h1>
+            <p>All the delicious recipes you've loved in one place</p>
+        </div>
+        
+        <% if (recipes.length > 0) { %>
+            <div class="favorites-grid">
+                <% recipes.forEach(recipe => { %>
+                    <div class="recipe-card" data-recipe-id="<%= recipe.recipe_id %>">
+                        <button class="favorite-btn liked" title="Remove from favorites">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <a href="/recipes/<%= recipe.recipe_id %>">
+                            <div class="recipe-image">
+                                <img src="/images/<%= recipe.image_url || 'recipe-placeholder.jpg' %>" alt="<%= recipe.name %>">
+                            </div>
+                            <div class="recipe-content">
+                                <h3 class="recipe-title"><%= recipe.name %></h3>
+                                <div class="recipe-meta">
+                                    <span><i class="fas fa-clock"></i> <%= recipe.time || '30 mins' %></span>
+                                    <span><i class="fas fa-utensils"></i> <%= recipe.difficulty || 'Medium' %></span>
+                                </div>
+                                <% if (recipe.tags && recipe.tags.length > 0) { %>
+                                    <div class="tags">
+                                        <% recipe.tags.slice(0, 3).forEach(tag => { %>
+                                            <span class="tag"><%= tag %></span>
+                                        <% }) %>
+                                    </div>
+                                <% } %>
+                                <div class="nutrition-badges">
+                                    <span class="nutrition-badge"><i class="fas fa-fire"></i> <%= recipe.calories || '0' %> cal</span>
+                                    <span class="nutrition-badge"><i class="fas fa-dumbbell"></i> <%= recipe.protein || '0' %>g protein</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="empty-state">
+                <i class="far fa-heart"></i>
+                <h2>No favorites yet</h2>
+                <p>Start liking recipes to see them appear here</p>
+                <a href="/recipes" class="btn btn-primary">
+                    <i class="fas fa-utensils"></i> Browse Recipes
+                </a>
+            </div>
+        <% } %>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Remove from favorites functionality
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+                    const card = this.closest('.recipe-card');
+                    const recipeId = card.dataset.recipeId;
+                    
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    
+                    try {
+                        const response = await fetch(`/favourites/remove/${recipeId}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            card.style.opacity = '0';
+                            setTimeout(() => {
+                                card.remove();
+                                // If no cards left, show empty state
+                                if (document.querySelectorAll('.recipe-card').length === 0) {
+                                    showEmptyState();
+                                }
+                            }, 300);
+                            showToast('Removed from favorites', 'success');
+                        } else {
+                            this.innerHTML = '<i class="fas fa-heart"></i>';
+                            showToast('Failed to remove', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        this.innerHTML = '<i class="fas fa-heart"></i>';
+                        showToast('Network error', 'error');
+                    }
+                });
+            });
+            
+            function showEmptyState() {
+                const grid = document.querySelector('.favorites-grid');
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="far fa-heart"></i>
+                        <h2>No favorites left</h2>
+                        <p>All your favorites have been removed</p>
+                        <a href="/recipes" class="btn btn-primary">
+                            <i class="fas fa-utensils"></i> Browse Recipes
+                        </a>
+                    </div>
+                `;
+            }
+            
+            function showToast(message, type) {
+                const toast = document.getElementById('toast');
+                toast.textContent = message;
+                toast.className = `toast ${type}`;
+                
+                setTimeout(() => {
+                    toast.classList.add('show');
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                    }, 3000);
+                }, 10);
+            }
+        });
+    </script>
+</body>
+</html>

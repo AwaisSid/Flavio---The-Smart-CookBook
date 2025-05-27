@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Planner</title>
+    <link rel="stylesheet" href="/styles.css"> 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            color: #28a745;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #28a745;
+            color: white;
+        }
+        img {
+            max-width: 50px;
+            border-radius: 5px;
+        }
+        button {
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        button:hover {
+            background: darkred;
+        }
+        select, input {
+            padding: 5px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Meal Planner for User ID: <%= user_id %></h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Meal Type</th>
+                <th>Recipe</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% mealPlans.forEach(meal => { %>
+                <tr>
+                    <td><%= meal.plan_day %></td>
+                    <td><%= meal.meal_type %></td>
+                    <td>
+                        <img src="<%= meal.recipe_image %>" width="50">
+                        <%= meal.recipe_name %>
+                    </td>
+                    <td>
+                        <form action="/meal-planner/delete" method="POST">
+                            <input type="hidden" name="meal_plan_id" value="<%= meal.meal_plan_id %>">
+                            <input type="hidden" name="user_id" value="<%= user_id %>">
+                            <button type="submit">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <h2>Add a Meal</h2>
+    <form action="/meal-planner/add" method="POST">
+        <input type="hidden" name="user_id" value="<%= user_id %>">
+        
+        <label>Day:</label>
+        <select name="plan_day" required>
+            <option value="">Select Day</option>
+            <% ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].forEach(day => { %>
+                <option value="<%= day %>"><%= day %></option>
+            <% }) %>
+        </select>
+
+        <label>Meal Type:</label>
+        <select name="meal_type" required>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="dinner">Dinner</option>
+        </select>
+
+        <label>Recipe:</label>
+        <select name="recipe_id" required>
+            <% recipes.forEach(recipe => { %>
+                <option value="<%= recipe.recipe_id %>"><%= recipe.name %></option>
+            <% }) %>
+        </select>
+
+        <button type="submit">Add Meal</button>
+    </form>
+</body>
+</html>

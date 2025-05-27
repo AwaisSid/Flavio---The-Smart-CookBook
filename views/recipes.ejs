@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discover Recipes | Flaavio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/styles/dashboard.css">
+  <style>
+    :root {
+      --primary: #FF6B6B;
+      --secondary: #4ECDC4;
+      --dark: #292F36;
+      --light: #F7FFF7;
+      --accent: #FF9F1C;
+    }
+    
+    .recipes-hero {
+      background: linear-gradient(rgba(0,0,0,0.7), url('/images/recipes-hero.jpg')) center/cover ,no-repeat;
+
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+      margin-bottom: 3rem;
+    }
+    
+    .recipes-hero-content h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .recipes-hero-content p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    
+    .search-filter-container {
+      max-width: 1200px;
+      margin: 0 auto 3rem;
+      padding: 0 2rem;
+    }
+    
+    .search-filter-form {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    
+    .search-input {
+      flex: 1;
+      min-width: 300px;
+      padding: 1rem;
+      border: 2px solid #eee;
+      border-radius: 50px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+    }
+    
+    .category-select {
+      padding: 1rem;
+      border: 2px solid #eee;
+      border-radius: 50px;
+      font-size: 1rem;
+      background: white;
+      min-width: 200px;
+    }
+    
+    .search-btn {
+      padding: 1rem 2rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .search-btn:hover {
+      background: #e05a5a;
+      transform: translateY(-2px);
+    }
+    
+    .recipes-grid {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    .recipe-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .recipe-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .recipe-img {
+      height: 200px;
+      width: 100%;
+      object-fit: cover;
+    }
+    
+    .recipe-content {
+      padding: 1.5rem;
+    }
+    
+    .recipe-title {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+    
+    .recipe-meta {
+      display: flex;
+      justify-content: space-between;
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+    
+    .recipe-desc {
+      color: #666;
+      margin-bottom: 1.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .view-btn {
+      display: inline-block;
+      padding: 0.7rem 1.5rem;
+      background: var(--primary);
+      color: white;
+      border-radius: 50px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: all 0.3s ease;
+    }
+    
+    .view-btn:hover {
+      background: var(--dark);
+    }
+    
+    .cuisine-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--accent);
+      color: white;
+      padding: 0.3rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    .no-recipes {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem;
+      color: #666;
+    }
+    
+    @media (max-width: 768px) {
+      .recipes-hero {
+        height: 250px;
+      }
+      
+      .recipes-hero-content h1 {
+        font-size: 2rem;
+      }
+      
+      .search-filter-form {
+        flex-direction: column;
+      }
+      
+      .search-input, .category-select, .search-btn {
+        width: 100%;
+        border-radius: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header', { user: user, currentPage: 'recipes' }) %>
+  
+  <section class="recipes-hero">
+    <div class="recipes-hero-content">
+      <h1>Discover Culinary Inspiration</h1>
+      <p>Browse our collection of delicious recipes from around the world</p>
+    </div>
+  </section>
+  
+  <div class="search-filter-container">
+    <form action="/recipes" method="GET" class="search-filter-form">
+      <input type="text" name="search" placeholder="Search recipes..." 
+             class="search-input" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+      <select name="category" class="category-select">
+        <option value="">All Categories</option>
+        <option value="Continental" <%= category === 'Continental' ? 'selected' : '' %>>Continental</option>
+        <option value="Indian" <%= category === 'Indian' ? 'selected' : '' %>>Indian</option>
+        <option value="Chinese" <%= category === 'Chinese' ? 'selected' : '' %>>Chinese</option>
+        <option value="vegetarian" <%= category === 'vegetarian' ? 'selected' : '' %>>Vegetarian</option>
+        <option value="Italian" <%= category === 'Italian' ? 'selected' : '' %>>Italian</option>
+        <option value="Worldwide" <%= category === 'Worldwide' ? 'selected' : '' %>>Worldwide</option>
+
+      </select>
+      <button type="submit" class="search-btn">
+        <i class="fas fa-search"></i> Search
+      </button>
+    </form>
+  </div>
+  
+  <div class="recipes-grid">
+    <% if (recipes.length > 0) { %>
+      <% recipes.forEach(recipe => { %>
+        <div class="recipe-card">
+          <% if (recipe.cuisine) { %>
+            <div class="cuisine-badge"><%= recipe.cuisine %></div>
+          <% } %>
+          
+          <img src="/images/<%= recipe.image_url %>" alt="<%= recipe.name %>" class="recipe-img">
+          
+          <div class="recipe-content">
+            <h3 class="recipe-title"><%= recipe.name %></h3>
+            
+            <div class="recipe-meta">
+              <span><i class="fas fa-clock"></i> <%= recipe.time %></span>
+              <span><i class="fas fa-utensils"></i> <%= recipe.difficulty%></span>
+            </div>
+            
+            <p class="recipe-desc">
+              <%= recipe.description || 'A delicious recipe waiting for you to discover' %>
+            </p>
+           
+            <a href="/recipes/<%= recipe.recipe_id %>" class="view-btn" data-recipe-id="<%= recipe.recipe_id %>">View Recipe</a>        </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <div class="no-recipes">
+        <h3>No recipes found</h3>
+        <p>Try adjusting your search filters</p>
+      </div>
+    <% } %>
+  </div>
+  
+  <%- include('partials/footer') %>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Animation for recipe cards
+      const cards = document.querySelectorAll('.recipe-card');
+      cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = `all 0.5s ease ${index * 0.1}s`;
+        
+        setTimeout(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        }, 100);
+      });
+  
+      // Track recipe views
+      document.querySelectorAll('a[href^="/recipes/"]').forEach(link => {
+        link.addEventListener('click', async function(e) {
+          // Only handle links with recipe IDs (not the search/filter links)
+          if (this.classList.contains('view-btn')) {
+            e.preventDefault();
+            const recipeId = this.getAttribute('data-recipe-id') || 
+                            this.getAttribute('href').split('/')[2];
+            
+            try {
+              // Track view
+              await fetch(`/recipes/${recipeId}/track-view`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin'
+              });
+              
+              // Then navigate to the recipe
+              window.location.href = this.getAttribute('href');
+            } catch (err) {
+              console.error('Error tracking view:', err);
+              // Still navigate even if tracking fails
+              window.location.href = this.getAttribute('href');
+            }
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

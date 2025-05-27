@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Recommendations | Flaavio</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .recipe-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        .recipe-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .preview-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+        }
+        .preview-content {
+            animation: fadeIn 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .difficulty-badge {
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        .difficulty-easy { background-color: #ECFDF5; color: #065F46; }
+        .difficulty-medium { background-color: #FFFBEB; color: #92400E; }
+        .difficulty-hard { background-color: #FEE2E2; color: #991B1B; }
+        .nutrition-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <%- include('partials/header') %>
+
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Recommended For You</h1>
+        <p class="text-gray-600 mb-6">Discover delicious recipes based on your preferences</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <% recommendations.forEach(recipe => { %>
+                <div class="recipe-card bg-white rounded-xl overflow-hidden border border-gray-100">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="/images/<%= recipe.image_url || 'default-recipe.jpg' %>" 
+                             alt="<%= recipe.name %>" 
+                             class="w-full h-full object-cover">
+                        <% if (recipe.difficulty) { %>
+                            <div class="absolute top-3 right-3">
+                                <span class="difficulty-badge px-2 py-1 rounded-full font-medium <%= 
+                                    recipe.difficulty === 'easy' ? 'difficulty-easy' : 
+                                    recipe.difficulty === 'medium' ? 'difficulty-medium' : 'difficulty-hard' %>">
+                                    <%= recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1) %>
+                                </span>
+                            </div>
+                        <% } %>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2"><%= recipe.name %></h3>
+                        
+                        <div class="flex items-center text-gray-600 text-sm mb-3">
+                            <span class="flex items-center mr-4">
+                                <i class="far fa-clock mr-1"></i>
+                                <%= recipe.time || '30 mins' %>
+                            </span>
+                            <% if (recipe.cuisine) { %>
+                                <span class="flex items-center">
+                                    <i class="fas fa-utensils mr-1"></i>
+                                    <%= recipe.cuisine %>
+                                </span>
+                            <% } %>
+                        </div>
+                        
+                        <% if (recipe.calories || recipe.carbs) { %>
+                            <div class="flex flex-wrap gap-2 mb-4">
+                                <% if (recipe.calories) { %>
+                                    <span class="nutrition-badge bg-blue-100 text-blue-800 rounded-full">
+                                        <i class="fas fa-fire mr-1"></i> <%= recipe.calories %> cal
+                                    </span>
+                                <% } %>
+                                <% if (recipe.carbs) { %>
+                                    <span class="nutrition-badge bg-green-100 text-green-800 rounded-full">
+                                        <i class="fas fa-bread-slice mr-1"></i> <%= recipe.carbs %>g carbs
+                                    </span>
+                                <% } %>
+                                <% if (recipe.protein) { %>
+                                    <span class="nutrition-badge bg-yellow-100 text-yellow-800 rounded-full">
+                                        <i class="fas fa-dumbbell mr-1"></i> <%= recipe.protein %>g protein
+                                    </span>
+                                <% } %>
+                            </div>
+                        <% } %>
+                        
+                        <button onclick="showPreview('<%= recipe.recipe_id %>')" 
+                                class="w-full py-2 bg-blue-500 text-white rounded-lg hover:bg-orange-600 transition">
+                            Quick Preview
+                        </button>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    </main>
+
+    <!-- Recipe Preview Modal (Simplified without description) -->
+    <div id="previewOverlay" class="preview-overlay flex items-center justify-center p-4">
+        <div class="preview-content bg-white rounded-lg max-w-md w-full mx-4 p-6">
+            <div class="relative mb-4">
+                <img id="previewImage" src="" alt="" class="w-full h-48 object-cover rounded-lg mb-4">
+                <span id="previewDifficulty" class="difficulty-badge absolute top-3 right-3 px-2 py-1 rounded-full font-medium"></span>
+            </div>
+            
+            <h2 id="previewTitle" class="text-2xl font-bold text-gray-900 mb-2"></h2>
+            
+            <div class="flex items-center text-gray-600 text-sm mb-3">
+                <span id="previewTime" class="flex items-center mr-4">
+                    <i class="far fa-clock mr-1"></i>
+                </span>
+                <span id="previewCuisine" class="flex items-center">
+                    <i class="fas fa-utensils mr-1"></i>
+                </span>
+            </div>
+            
+            <div id="previewNutrition" class="flex flex-wrap gap-2 mb-6"></div>
+            
+            <div class="flex justify-end space-x-3">
+                <button onclick="hidePreview()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                    Close
+                </button>
+                <a id="viewRecipeBtn" href="#" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    View Full Recipe
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        // Show recipe preview with all details except description
+        function showPreview(recipeId) {
+            fetch(`/recommendations/preview/${recipeId}`)
+                .then(response => response.json())
+                .then(recipe => {
+                    // Set basic info
+                    document.getElementById('previewTitle').textContent = recipe.name;
+                    document.getElementById('viewRecipeBtn').href = `/recipes/${recipe.recipe_id}`;
+                    
+                    // Set image
+                    const previewImage = document.getElementById('previewImage');
+                    previewImage.src = `/images/${recipe.image_url || 'default-recipe.jpg'}`;
+                    previewImage.alt = recipe.name;
+                    
+                    // Set time
+                    const timeElement = document.getElementById('previewTime');
+                    timeElement.innerHTML = `<i class="far fa-clock mr-1"></i> ${recipe.time || '30'} mins`;
+                    
+                    // Set cuisine if available
+                    const cuisineElement = document.getElementById('previewCuisine');
+                    if (recipe.cuisine) {
+                        cuisineElement.innerHTML = `<i class="fas fa-utensils mr-1"></i> ${recipe.cuisine}`;
+                        cuisineElement.style.display = 'flex';
+                    } else {
+                        cuisineElement.style.display = 'none';
+                    }
+                    
+                    // Set difficulty badge
+                    const difficultyBadge = document.getElementById('previewDifficulty');
+                    if (recipe.difficulty) {
+                        difficultyBadge.textContent = 
+                            recipe.difficulty.charAt(0).toUpperCase() + recipe.difficulty.slice(1);
+                        difficultyBadge.className = `difficulty-badge px-2 py-1 rounded-full font-medium ${
+                            recipe.difficulty === 'easy' ? 'difficulty-easy' : 
+                            recipe.difficulty === 'medium' ? 'difficulty-medium' : 'difficulty-hard'
+                        }`;
+                        difficultyBadge.style.display = 'inline-flex';
+                    } else {
+                        difficultyBadge.style.display = 'none';
+                    }
+                    
+                    // Set nutrition info
+                    const nutritionContainer = document.getElementById('previewNutrition');
+                    nutritionContainer.innerHTML = '';
+                    
+                    if (recipe.calories) {
+                        const caloriesBadge = document.createElement('span');
+                        caloriesBadge.className = 'nutrition-badge bg-blue-100 text-blue-800 rounded-full flex items-center';
+                        caloriesBadge.innerHTML = `<i class="fas fa-fire mr-1"></i> ${recipe.calories} cal`;
+                        nutritionContainer.appendChild(caloriesBadge);
+                    }
+                    
+                    if (recipe.carbs) {
+                        const carbsBadge = document.createElement('span');
+                        carbsBadge.className = 'nutrition-badge bg-green-100 text-green-800 rounded-full flex items-center';
+                        carbsBadge.innerHTML = `<i class="fas fa-bread-slice mr-1"></i> ${recipe.carbs}g carbs`;
+                        nutritionContainer.appendChild(carbsBadge);
+                    }
+                    
+                    if (recipe.protein) {
+                        const proteinBadge = document.createElement('span');
+                        proteinBadge.className = 'nutrition-badge bg-yellow-100 text-yellow-800 rounded-full flex items-center';
+                        proteinBadge.innerHTML = `<i class="fas fa-dumbbell mr-1"></i> ${recipe.protein}g protein`;
+                        nutritionContainer.appendChild(proteinBadge);
+                    }
+                    
+                    // Show the overlay
+                    document.getElementById('previewOverlay').style.display = 'flex';
+                })
+                .catch(err => {
+                    console.error('Error loading preview:', err);
+                    alert('Failed to load recipe details');
+                });
+        }
+
+        // Hide preview
+        function hidePreview() {
+            document.getElementById('previewOverlay').style.display = 'none';
+        }
+
+        // Close preview when clicking outside
+        document.getElementById('previewOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hidePreview();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Grocery List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-top: 2rem;
+        }
+        .grocery-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        .grocery-header {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .recipe-badge {
+            background-color: #4361ee;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+        .ingredient-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .ingredient-item:last-child {
+            border-bottom: none;
+        }
+        .print-section {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid #eee;
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            background-color: #4361ee;
+            color: white;
+            border: none;
+        }
+        .quantity-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .nutrition-note {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        
+        @media print {
+            .no-print, .quantity-control {
+                display: none !important;
+            }
+            body {
+                background: white;
+                padding: 0;
+            }
+            .grocery-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', { currentPage: 'grocery' }) %>
+
+    <div class="container grocery-container">
+        <div class="grocery-header">
+            <h1 class="text-center mb-3"><i class="fas fa-shopping-basket me-2"></i>My Grocery List</h1>
+            
+            <% if (recipeNames && recipeNames.length > 0) { %>
+                <div class="text-center mb-4">
+                    <h5>Recipes Included:</h5>
+                    <div class="d-flex flex-wrap justify-content-center">
+                        <% recipeNames.forEach(name => { %>
+                            <span class="recipe-badge"><%= name %></span>
+                        <% }) %>
+                    </div>
+                </div>
+            <% } %>
+        </div>
+
+        <% if (ingredients && ingredients.length > 0) { %>
+            <div class="ingredient-list">
+                <h4 class="mb-3"><i class="fas fa-list-ul me-2"></i>Ingredients</h4>
+                <% ingredients.forEach(([name, quantity]) => { 
+                    const safeId = name.replace(/\s+/g, '-');
+                %>
+                    <div class="ingredient-item">
+                        <div>
+                            <%= name %>
+                            <div class="nutrition-note" id="note-<%= safeId %>"></div>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="me-3"><%= quantity %>x</span>
+                            <div class="quantity-control no-print">
+                                <button class="quantity-btn" onclick="updateQuantity('<%= name %>', -1)">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="quantity-value" id="qty-<%= safeId %>"><%= quantity %></span>
+                                <button class="quantity-btn" onclick="updateQuantity('<%= name %>', 1)">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                <% }) %>
+            </div>
+        <% } else { %>
+            <div class="alert alert-info">
+                No ingredients found. Generate a grocery list from your nutrition planner.
+            </div>
+        <% } %>
+
+        <div class="print-section text-center no-print">
+            <button onclick="window.print()" class="btn btn-primary">
+                <i class="fas fa-print me-2"></i>Print Grocery List
+            </button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize notes on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            <% ingredients.forEach(([name, quantity]) => { 
+                const safeId = name.replace(/\s+/g, '-');
+            %>
+                updateNote('<%= name %>', <%= quantity %>, '<%= safeId %>');
+            <% }) %>
+        });
+
+        function updateQuantity(ingredient, change) {
+            const safeId = ingredient.replace(/\s+/g, '-');
+            const qtyElement = document.getElementById(`qty-${safeId}`);
+            let newQty = parseInt(qtyElement.textContent) + change;
+            
+            if (newQty < 1) newQty = 1;
+            qtyElement.textContent = newQty;
+            
+            updateNote(ingredient, newQty, safeId);
+            
+            // Send update to server
+            fetch(`/grocery/update-quantity/${listId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ingredient: ingredient,
+                    quantity: newQty
+                })
+            }).catch(err => console.error('Error updating quantity:', err));
+        }
+
+        function updateNote(ingredient, quantity, safeId) {
+            const noteElement = document.getElementById(`note-${safeId}`);
+            let note = '';
+            
+            if (quantity === 1) note = 'Standard portion';
+            else if (quantity === 2) note = 'Light increase';
+            else if (quantity === 3) note = 'Moderate increase';
+            else if (quantity >= 4) note = 'High quantity - check diet plan';
+            
+            noteElement.textContent = note;
+        }
+    </script>
+</body>
+<%- include('partials/footer') %>
+</html>

@@ -1,0 +1,344 @@
+<!-- views/partials/header.ejs -->
+<header class="app-header">
+    <div class="header-container">
+      <!-- Logo -->
+      <a href="/" class="logo-link">
+        <img src="/images/Flavio.png" alt="Flaavio" class="logo-image">
+      </a>
+  
+      <!-- Mobile Menu Toggle -->
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle navigation">
+        <span class="toggle-bar"></span>
+        <span class="toggle-bar"></span>
+        <span class="toggle-bar"></span>
+      </button>
+  
+      <!-- Navigation -->
+      <nav class="main-navigation" id="mainNav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'home' ? 'active' : '' %>">
+              <i class="fas fa-home nav-icon"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/recipes" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'recipes' ? 'active' : '' %>">
+              <i class="fas fa-utensils nav-icon"></i> Recipes
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/nutrition/planner" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'nutrition' ? 'active' : '' %>">
+              <i class="fas fa-calendar-alt nav-icon"></i> Nutrition Plans
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="/grocery" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'grocery-list' ? 'active' : '' %>">
+              <i class="fas fa-shopping-basket nav-icon"></i> Grocery Lists
+            </a>
+          </li>
+          
+          <% if (!user) { %>
+            <li class="nav-item">
+              <a href="/login" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'login' ? 'active' : '' %>">
+                <i class="fas fa-sign-in-alt nav-icon"></i> Login
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/signup" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'signup' ? 'active' : '' %>">
+                <i class="fas fa-user-plus nav-icon"></i> Sign Up
+              </a>
+            </li>
+          <% } else { %>
+            <li class="nav-item user-menu">
+              <div class="user-toggle">
+                <img src="/assets/user-avatar.png" alt="<%= user.username %>" class="user-avatar">
+                <span class="username"><%= user.username %></span>
+                <i class="fas fa-chevron-down dropdown-icon"></i>
+              </div>
+              <ul class="user-dropdown">
+                <li>
+                  <a href="/profile" class="dropdown-link">
+                    <i class="fas fa-user"></i> My Profile
+                  </a>
+                </li>
+                <li>
+                  
+              
+                <li class="divider"></li>
+                <% if (user.isAdmin) { %>
+                  <li>
+                    <a href="/admin" class="dropdown-link admin-link">
+                      <i class="fas fa-lock"></i> Admin Panel
+                    </a>
+                  </li>
+                  <li class="divider"></li>
+                <% } %>
+                <li>
+                  <a href="/logout" class="dropdown-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+  <style>
+    /* Header Styles */
+    .app-header {
+      background-color: #292f36;
+      padding: 0 5%;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+  
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 70px;
+    }
+  
+    .logo-link {
+      display: flex;
+      align-items: center;
+    }
+  
+    .logo-image {
+      height: 150px;
+      transition: transform 0.3s ease;
+    }
+  
+    .logo-image:hover {
+      transform: scale(1.05);
+    }
+  
+    /* Mobile Menu Toggle */
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 10px;
+    }
+  
+    .toggle-bar {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: white;
+      margin: 5px 0;
+      transition: all 0.3s ease;
+    }
+  
+    /* Navigation */
+    .main-navigation {
+      display: flex;
+      align-items: center;
+    }
+  
+    .nav-list {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      align-items: center;
+    }
+  
+    .nav-item {
+      position: relative;
+      margin-left: 20px;
+    }
+  
+    .nav-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+  
+    .nav-link:hover, .nav-link.active {
+      background-color: rgba(255,255,255,0.1);
+      color: #4ECDC4;
+    }
+  
+    .nav-link.active {
+      font-weight: 600;
+    }
+  
+    .nav-icon {
+      margin-right: 8px;
+      font-size: 16px;
+    }
+  
+    /* User Menu */
+    .user-toggle {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 10px 15px;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+  
+    .user-toggle:hover {
+      background-color: rgba(255,255,255,0.1);
+    }
+  
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+  
+    .username {
+      margin-right: 8px;
+      color: white;
+    }
+  
+    .dropdown-icon {
+      color: white;
+      font-size: 12px;
+      transition: transform 0.3s ease;
+    }
+  
+    .user-menu:hover .dropdown-icon {
+      transform: rotate(180deg);
+    }
+  
+    .user-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: white;
+      min-width: 200px;
+      border-radius: 5px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      list-style: none;
+      padding: 10px 0;
+      margin: 0;
+      z-index: 100;
+    }
+  
+    .user-menu:hover .user-dropdown {
+      display: block;
+    }
+  
+    .dropdown-link {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      color: #292f36;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+  
+    .dropdown-link:hover {
+      background-color: #f5f5f5;
+      color: #FF6B6B;
+    }
+  
+    .dropdown-link i {
+      margin-right: 10px;
+      width: 20px;
+      text-align: center;
+    }
+  
+    .admin-link {
+      color: #FF6B6B;
+    }
+  
+    .divider {
+      height: 1px;
+      background: #eee;
+      margin: 5px 0;
+    }
+  
+    /* Responsive Styles */
+    @media (max-width: 768px) {
+      .mobile-menu-toggle {
+        display: block;
+      }
+  
+      .main-navigation {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: #292f36;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+        box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        transform: translateY(-150%);
+        transition: transform 0.3s ease;
+      }
+  
+      .main-navigation.active {
+        transform: translateY(0);
+      }
+  
+      .nav-list {
+        flex-direction: column;
+        width: 100%;
+      }
+  
+      .nav-item {
+        margin: 10px 0;
+        width: 100%;
+      }
+  
+      .nav-link {
+        padding: 12px 0;
+      }
+  
+      .user-menu {
+        width: 100%;
+      }
+  
+      .user-dropdown {
+        position: static;
+        width: 100%;
+        box-shadow: none;
+        display: none;
+      }
+  
+      .user-menu:hover .user-dropdown {
+        display: block;
+      }
+    }
+  </style>
+  
+  <script>
+    // Mobile menu toggle functionality
+    document.getElementById('mobileMenuToggle').addEventListener('click', function() {
+      this.classList.toggle('active');
+      document.getElementById('mainNav').classList.toggle('active');
+    });
+  
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const userMenu = document.querySelector('.user-menu');
+      if (!userMenu.contains(event.target)) {
+        const dropdown = document.querySelector('.user-dropdown');
+        if (dropdown.style.display === 'block') {
+          dropdown.style.display = 'none';
+        }
+      }
+    });
+  </script>

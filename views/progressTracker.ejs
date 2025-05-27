@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progress - Recipe App</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Your Progress</h2>
+    <ul>
+      <% achievements.forEach(achievement => { %>
+        <li><%= achievement.achievement_name %> - <%= achievement.date %></li>
+      <% }) %>
+    </ul>
+  </div>
+</body>
+</html>

@@ -1,0 +1,955 @@
+<%
+function formatTime(seconds) {
+    if (!seconds) return 'N/A';
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooking Timer | Flaavio</title>
+    <link rel="stylesheet" href="/public/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Layout */
+        body {
+          display: flex;
+          flex-direction: column;
+          background-color: #f8f9fa;
+          margin: 0;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+      
+        main.container {
+          flex: 1;
+          padding: 4rem;
+          max-width: 1200px;
+          margin: 0 auto;
+          width: 90%;
+        }
+      
+        /* Timer Container */
+        .timer-container {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2rem;
+          margin-top: 1.5rem;
+        }
+      
+        @media (max-width: 768px) {
+          .timer-container {
+            grid-template-columns: 1fr;
+          }
+        }
+      
+        /* Active Timers Section */
+        .active-timers {
+          background: white;
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          height: fit-content;
+        }
+      
+        .active-timers h2 {
+          color: #2c3e50;
+          margin-bottom: 1.5rem;
+          font-size: 1.5rem;
+          border-bottom: 2px solid #eee;
+          padding-bottom: 0.5rem;
+        }
+      
+        .timer-card {
+          background: #fff;
+          border-radius: 10px;
+          padding: 1.5rem;
+          margin-bottom: 1.25rem;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+          border: 1px solid #eee;
+          transition: transform 0.2s ease;
+        }
+      
+        .timer-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+      
+        .timer-display {
+          font-size: 2.5rem;
+          font-family: 'Courier New', monospace;
+          text-align: center;
+          margin: 1rem 0;
+          color: #2c3e50;
+          font-weight: bold;
+        }
+      
+        .timer-controls {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+      
+        .timer-btn {
+          padding: 0.75rem 1.25rem;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
+        }
+      
+        .timer-btn i {
+          font-size: 1rem;
+        }
+      
+        .start-btn { 
+          background: #4CAF50; 
+          color: white; 
+        }
+        .start-btn:hover { background: #3e8e41; }
+      
+        .pause-btn { 
+          background: #FFC107; 
+          color: black; 
+        }
+        .pause-btn:hover { background: #e0a800; }
+      
+        .resume-btn { 
+          background: #2196F3; 
+          color: white; 
+        }
+        .resume-btn:hover { background: #0b7dda; }
+      
+        .stop-btn { 
+          background: #F44336; 
+          color: white; 
+        }
+        .stop-btn:hover { background: #d32f2f; }
+      
+        /* Recipe Selector */
+        .recipe-selector {
+          background: white;
+          border-radius: 12px;
+          padding: 1.5rem;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          height: fit-content;
+        }
+      
+        .recipe-selector h2 {
+          color: #2c3e50;
+          margin-bottom: 1.5rem;
+          font-size: 1.5rem;
+          border-bottom: 2px solid #eee;
+          padding-bottom: 0.5rem;
+        }
+      
+        #recipe-options {
+          max-height: 400px;
+          overflow-y: auto;
+          margin-bottom: 1.5rem;
+          padding-right: 0.5rem;
+        }
+      
+        .recipe-option {
+          display: flex;
+          align-items: center;
+          gap: 1.25rem;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border-radius: 8px;
+          background: #f8f9fa;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: 1px solid #eee;
+        }
+      
+        .recipe-option:hover {
+          background: #e9f5ff;
+          transform: translateX(4px);
+        }
+      
+        .recipe-option img {
+          width: 70px;
+          height: 70px;
+          border-radius: 6px;
+          object-fit: cover;
+          border: 1px solid #ddd;
+        }
+      
+        .recipe-option h3 {
+          margin: 0;
+          font-size: 1.1rem;
+          color: #333;
+        }
+      
+        .recipe-option p {
+          margin: 0.25rem 0 0;
+          color: #666;
+          font-size: 0.9rem;
+        }
+      
+        /* Duration Selector */
+        .duration-selector {
+          margin: 1.5rem 0;
+        }
+      
+        .duration-selector h3 {
+          margin-bottom: 0.75rem;
+          font-size: 1.1rem;
+          color: #444;
+        }
+      
+        .duration-btn {
+          padding: 0.6rem 1rem;
+          margin-right: 0.75rem;
+          margin-bottom: 0.5rem;
+          background: #e9ecef;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          font-size: 0.9rem;
+        }
+      
+        .duration-btn:hover {
+          background: #dee2e6;
+        }
+      
+        .duration-btn.active {
+          background: #4CAF50;
+          color: white;
+        }
+      
+        /* Empty States */
+        .empty-state {
+          text-align: center;
+          color: #666;
+          padding: 2rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+          border: 1px dashed #ddd;
+        }
+      
+        .empty-state .btn {
+          margin-top: 1rem;
+          display: inline-block;
+          padding: 0.5rem 1rem;
+          background: #4CAF50;
+          color: white;
+          text-decoration: none;
+          border-radius: 4px;
+          font-size: 0.9rem;
+        }
+      
+        /* Modal styles */
+        .modal {
+          display: none;
+          position: fixed;
+          z-index: 1000;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0,0,0,0.7);
+        }
+        
+        .modal-content {
+          background-color: #fefefe;
+          margin: 5% auto;
+          padding: 2rem;
+          border-radius: 12px;
+          width: 80%;
+          max-width: 800px;
+          max-height: 80vh;
+          overflow-y: auto;
+        }
+        
+        .close-modal {
+          color: #aaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+        
+        .close-modal:hover {
+          color: black;
+        }
+        
+        .recipe-options-container {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1rem;
+        }
+        
+        /* Notification styles */
+        .notification {
+          display: none;
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          z-index: 1000;
+          background-color: #4CAF50;
+          color: white;
+          padding: 1rem;
+          border-radius: 8px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+          max-width: 350px;
+        }
+        
+        .notification-content {
+          position: relative;
+        }
+        
+        .close-notification {
+          position: absolute;
+          top: -10px;
+          right: -10px;
+          color: white;
+          font-size: 20px;
+          cursor: pointer;
+          background: rgba(0,0,0,0.2);
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        /* Timer completion styles */
+        .timer-completed {
+          animation: pulse 2s infinite;
+          border: 2px solid #4CAF50;
+        }
+        
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+          70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+        }
+        
+        /* Selected recipe styles */
+        .selected-recipe {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          background: #f0f8ff;
+          border-radius: 8px;
+          border: 1px solid #d0e3ff;
+        }
+        
+        .selected-recipe img {
+          width: 60px;
+          height: 60px;
+          border-radius: 6px;
+          object-fit: cover;
+        }
+        .loading-state {
+    text-align: center;
+    padding: 2rem;
+    color: 666;
+    font-style: italic;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+}
+
+.empty-state .btn {
+    margin-top: 1rem;
+}
+
+.error-state {
+    text-align: center;
+    padding: 1.5rem;
+    color: #dc3545;
+}
+
+.error-detail {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin: 0.5rem 0;
+}
+
+.timer-btn[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.fa-spinner {
+    margin-right: 8px;
+}
+
+    </style>
+</head>
+<body class="site-wrapper">
+    <%- include('partials/header') %>
+
+    <main class="site-content">
+        <h1>Cooking Timer</h1>
+        
+        <div class="timer-container">
+            <div class="active-timers">
+                <h2>Active Timers</h2>
+                <div id="timers-list">
+                    <!-- Timers will be loaded here via JavaScript -->
+                    <p class="empty-state">No active timers <a href="#" class="btn browse-recipes">Browse Recipes</a></p>
+                </div>
+            </div>
+
+            <div class="recipe-selector">
+              <h2>Start New Timer</h2>
+              <div id="recipe-selection-area">
+                  <% if (recipes && recipes.length > 0) { %>
+                      <div id="recipe-options">
+                          <% recipes.forEach(recipe => { %>
+                              <div class="recipe-option" data-recipe-id="<%= recipe.recipe_id %>">
+                                  <img src="<%= recipe.image_url ? '/images/' + recipe.image_url : '/images/recipe-placeholder.jpg' %>" 
+                                       alt="<%= recipe.name %>">
+                                  <div>
+                                      <h3><%= recipe.name %></h3>
+                                      <p><i class="far fa-clock"></i> <%= formatTime(recipe.time) || 'N/A' %></p>
+                                  </div>
+                              </div>
+                          <% }) %>
+                      </div>
+                  <% } else { %>
+                      <div class="empty-state">
+                          <p>No recipes available</p>
+                          <a href="/recipes/add" class="btn">Add New Recipe</a>
+                      </div>
+                  <% } %>
+              </div>
+
+                <div class="duration-selector">
+                    <h3>Duration</h3>
+                    <button class="duration-btn active" data-duration="300">5 min</button>
+                    <button class="duration-btn" data-duration="600">10 min</button>
+                    <button class="duration-btn" data-duration="900">15 min</button>
+                    <button class="duration-btn" data-duration="1800">30 min</button>
+                    <button class="duration-btn" data-duration="3600">60 min</button>
+                </div>
+
+                <button id="start-timer" class="timer-btn start-btn">
+                    <i class="fas fa-play"></i> Start Timer
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Recipe Selection Modal -->
+    <div id="recipeModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Select a Recipe</h2>
+        <div id="modal-recipe-options" class="recipe-options-container">
+          <!-- Recipes will be loaded here via JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Completion Notification -->
+    <div id="successNotification" class="notification">
+      <div class="notification-content">
+        <span class="close-notification">&times;</span>
+        <h3>🎉 Recipe Completed!</h3>
+        <p id="completionMessage"></p>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <script>
+      // Timer and Recipe Management System
+      let selectedRecipe = null;
+      let selectedDuration = 300;
+      const activeTimers = {};  // Changed from 'timers' to be more descriptive
+
+      // Initialize the application
+      document.addEventListener('DOMContentLoaded', function() {
+          initializeEventListeners();
+          loadActiveTimers();
+      });
+
+      // Set up all event listeners
+      function initializeEventListeners() {
+          // Browse recipes buttons
+          document.querySelectorAll('.browse-recipes').forEach(btn => {
+              btn.addEventListener('click', function(e) {
+                  e.preventDefault();
+                  openRecipeModal();
+              });
+          });
+
+          // Modal close buttons
+          document.querySelector('.close-modal').addEventListener('click', closeRecipeModal);
+          document.querySelector('.close-notification').addEventListener('click', closeNotification);
+
+          // Recipe selection in main view
+          document.querySelectorAll('.recipe-option').forEach(option => {
+              option.addEventListener('click', function() {
+                  selectRecipe(this);
+              });
+          });
+
+          // Duration selection
+          document.querySelectorAll('.duration-btn').forEach(btn => {
+              btn.addEventListener('click', function() {
+                  selectDuration(this);
+              });
+          });
+
+          // Start timer button
+          document.getElementById('start-timer').addEventListener('click', startTimerHandler);
+
+          // Close modal when clicking outside
+          window.addEventListener('click', function(event) {
+              if (event.target === document.getElementById('recipeModal')) {
+                  closeRecipeModal();
+              }
+          });
+      }
+
+      // Recipe Selection Functions
+      function selectRecipe(recipeElement) {
+          // Clear previous selection
+          document.querySelectorAll('.recipe-option').forEach(opt => {
+              opt.style.backgroundColor = '#f8f9fa';
+          });
+          
+          // Highlight new selection
+          recipeElement.style.backgroundColor = '#e3f2fd';
+          selectedRecipe = recipeElement.dataset.recipeId;
+          
+          // Update the UI to show selection
+          updateSelectedRecipeDisplay(recipeElement);
+      }
+
+      function updateSelectedRecipeDisplay(recipeElement) {
+          const recipeName = recipeElement.querySelector('h3').textContent;
+          const recipeTime = recipeElement.querySelector('p').textContent;
+          const recipeImage = recipeElement.querySelector('img').src;
+          
+          const selectionArea = document.getElementById('recipe-selection-area');
+          selectionArea.innerHTML = `
+              <div class="selected-recipe" id="selected-recipe-display">
+                  <img src="${recipeImage}" alt="${recipeName}">
+                  <div>
+                      <h3>${recipeName}</h3>
+                      <p><i class="far fa-clock"></i> ${recipeTime}</p>
+                  </div>
+              </div>
+              <button class="btn browse-recipes change-recipe-btn" style="margin-top: 1rem; width: 100%">
+                  <i class="fas fa-exchange-alt"></i> Change Recipe
+              </button>
+          `;
+          
+          // Add event listener to the change button
+          document.querySelector('.change-recipe-btn').addEventListener('click', openRecipeModal);
+      }
+
+      // Modal Functions
+      function openRecipeModal() {
+          const modal = document.getElementById('recipeModal');
+          modal.style.display = 'block';
+          loadRecipesForModal();
+      }
+
+      function closeRecipeModal() {
+          document.getElementById('recipeModal').style.display = 'none';
+      }
+
+      function loadRecipesForModal() {
+    // Show loading state
+    const container = document.getElementById('modal-recipe-options');
+    container.innerHTML = `
+        <div class="loading-state">
+            <i class="fas fa-spinner fa-spin"></i> Loading recipes...
+        </div>
+    `;
+
+    fetch('/cooking-timer/recipes')
+        .then(response => {
+            // First, check if the response is ok (status 200-299)
+            if (!response.ok) {
+                throw new Error(`Server returned ${response.status} ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(recipes => {
+            // Clear container
+            container.innerHTML = '';
+            
+            // Check if we got valid recipes array
+            if (!Array.isArray(recipes)) {
+                throw new Error('Invalid recipes data received');
+            }
+            
+            if (recipes.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p>No recipes found in your collection</p>
+                        <a href="/recipes/add" class="btn">
+                            <i class="fas fa-plus"></i> Add New Recipe
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create and append recipe options
+            recipes.forEach(recipe => {
+                if (!recipe.recipe_id || !recipe.name) {
+                    console.warn('Invalid recipe data:', recipe);
+                    return;  // Skip invalid recipes
+                }
+                
+                const option = createRecipeOptionElement(recipe);
+                container.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Recipe loading failed:', error);
+            container.innerHTML = `
+                <div class="error-state">
+                    <p><i class="fas fa-exclamation-triangle"></i> Failed to load recipes</p>
+                    <p class="error-detail">${error.message}</p>
+                    <button onclick="loadRecipesForModal()" class="btn retry-btn">
+                        <i class="fas fa-sync-alt"></i> Try Again
+                    </button>
+                </div>
+            `;
+        });
+}
+      function createRecipeOptionElement(recipe) {
+          const option = document.createElement('div');
+          option.className = 'recipe-option';
+          option.dataset.recipeId = recipe.recipe_id;
+          option.innerHTML = `
+              <img src="${recipe.image_url ? '/images/' + recipe.image_url : '/images/recipe-placeholder.jpg'}" 
+                   alt="${recipe.name}">
+              <div>
+                  <h3>${recipe.name}</h3>
+                  <p><i class="far fa-clock"></i> ${recipe.time || 'N/A'}</p>
+              </div>
+          `;
+          option.addEventListener('click', function() {
+              selectRecipe(this);
+              closeRecipeModal();
+          });
+          return option;
+      }
+
+      // Duration Selection
+      function selectDuration(button) {
+          document.querySelectorAll('.duration-btn').forEach(b => {
+              b.classList.remove('active');
+          });
+          button.classList.add('active');
+          selectedDuration = parseInt(button.dataset.duration);
+      }
+
+      // Timer Control Functions
+      function startTimerHandler() {
+    if (!selectedRecipe) {
+        showAlert('Please select a recipe first');
+        return;
+    }
+
+    const startBtn = document.getElementById('start-timer');
+    startBtn.disabled = true;
+    startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Starting...';
+
+    fetch('/cooking-timer/start', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            recipeId: selectedRecipe,
+            duration: selectedDuration
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to start timer');
+        }
+        loadActiveTimers();
+    })
+    .catch(error => {
+        console.error('Start timer failed:', error);
+        showAlert(error.message);
+    })
+    .finally(() => {
+        startBtn.disabled = false;
+        startBtn.innerHTML = '<i class="fas fa-play"></i> Start Timer';
+    });
+}
+
+      function startTimer(recipeId, duration) {
+          return fetch('/cooking-timer/start', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  recipeId: recipeId,
+                  duration: duration
+              })
+          })
+          .then(handleFetchErrors)
+          .then(data => {
+              if (!data.success) {
+                  throw new Error(data.error || 'Failed to start timer');
+              }
+              return data;
+          });
+      }
+
+      function pauseTimer(timerId) {
+          fetch(`/cooking-timer/pause/${timerId}`, {
+              method: 'POST'
+          })
+          .then(handleFetchErrors)
+          .then(data => {
+              if (data.success) {
+                  loadActiveTimers();
+              }
+          })
+          .catch(console.error);
+      }
+
+      function resumeTimer(timerId) {
+          fetch(`/cooking-timer/resume/${timerId}`, {
+              method: 'POST'
+          })
+          .then(handleFetchErrors)
+          .then(data => {
+              if (data.success) {
+                  loadActiveTimers();
+              }
+          })
+          .catch(console.error);
+      }
+
+      function stopTimer(timerId) {
+          fetch(`/cooking-timer/stop/${timerId}`, {
+              method: 'POST'
+          })
+          .then(handleFetchErrors)
+          .then(data => {
+              if (data.success) {
+                  showCompletionNotification(timerId, data.completionTime);
+                  setTimeout(loadActiveTimers, 3000);
+              }
+          })
+          .catch(console.error);
+      }
+
+      function showCompletionNotification(timerId, completionTime) {
+          const notification = document.getElementById('successNotification');
+          const message = document.getElementById('completionMessage');
+          const timerCard = document.querySelector(`#timer-${timerId}`)?.closest('.timer-card');
+          
+          if (timerCard) {
+              timerCard.classList.add('timer-completed');
+              const recipeName = timerCard.querySelector('h3')?.textContent || 'the recipe';
+              message.textContent = `You made ${recipeName} in ${completionTime}! Great job!`;
+              notification.style.display = 'block';
+          }
+      }
+
+      function closeNotification() {
+          document.getElementById('successNotification').style.display = 'none';
+      }
+
+      // Timer Display Functions
+      function loadActiveTimers() {
+    const timersList = document.getElementById('timers-list');
+    timersList.innerHTML = '<div class="loading-state">Loading timers...</div>';
+
+    fetch('/cooking-timer/active')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Server error: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Ensure data is an array
+            const timers = Array.isArray(data) ? data : [];
+            
+            if (timers.length === 0) {
+                timersList.innerHTML = `
+                    <div class="empty-state">
+                        <p>No active timers</p>
+                        <button class="btn" onclick="openRecipeModal()">
+                            <i class="fas fa-utensils"></i> Start Cooking
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            timersList.innerHTML = '';
+            timers.forEach(timer => {
+                if (!timer.timer_id) {
+                    console.warn('Invalid timer data:', timer);
+                    return;
+                }
+                const timerElement = createTimerElement(timer);
+                timersList.appendChild(timerElement);
+                startTimerDisplay(timer.timer_id, timer);
+            });
+        })
+        .catch(error => {
+            console.error('Timer load error:', error);
+            timersList.innerHTML = `
+                <div class="error-state">
+                    <p>Failed to load timers</p>
+                    <p class="error-detail">${error.message}</p>
+                    <button onclick="loadActiveTimers()" class="btn">
+                        <i class="fas fa-sync-alt"></i> Try Again
+                    </button>
+                </div>
+            `;
+        });
+}
+
+      function renderTimersList(timers) {
+          const timersList = document.getElementById('timers-list');
+          
+          if (!timers || timers.length === 0) {
+              showEmptyTimerState('No active timers');
+              return;
+          }
+
+          timersList.innerHTML = '';
+          timers.forEach(timer => {
+              const timerElement = createTimerElement(timer);
+              timersList.appendChild(timerElement);
+              startTimerDisplay(timer.timer_id, timer);
+          });
+      }
+
+      function createTimerElement(timer) {
+          const timerElement = document.createElement('div');
+          timerElement.className = 'timer-card';
+          timerElement.id = `timer-card-${timer.timer_id}`;
+          timerElement.innerHTML = `
+              <div class="timer-header">
+                  <img src="${timer.image_url || '/images/recipe-placeholder.jpg'}" 
+                       alt="${timer.name}" width="50">
+                  <h3>${timer.name}</h3>
+              </div>
+              <div class="timer-display" id="timer-${timer.timer_id}">
+                  ${formatTimeDisplay(timer.duration)}
+              </div>
+              <div class="timer-controls">
+                  ${timer.status === 'running' ? 
+                      `<button class="timer-btn pause-btn" onclick="pauseTimer(${timer.timer_id})">
+                          <i class="fas fa-pause"></i> Pause
+                      </button>` : 
+                      `<button class="timer-btn resume-btn" onclick="resumeTimer(${timer.timer_id})">
+                          <i class="fas fa-play"></i> Resume
+                      </button>`}
+                  <button class="timer-btn stop-btn" onclick="stopTimer(${timer.timer_id})">
+                      <i class="fas fa-stop"></i> Stop
+                  </button>
+              </div>
+          `;
+          return timerElement;
+      }
+
+      function startTimerDisplay(timerId, timer) {
+          // Clear any existing interval for this timer
+          if (activeTimers[timerId]) {
+              clearTimeout(activeTimers[timerId]);
+          }
+
+          updateTimerDisplay(timerId, timer);
+      }
+
+      function updateTimerDisplay(timerId, timer) {
+          const now = new Date();
+          const startTime = new Date(timer.start_time);
+          let elapsedSeconds = Math.floor((now - startTime) / 1000);
+          
+          if (timer.status === 'paused') {
+              elapsedSeconds = timer.duration - (timer.duration - elapsedSeconds);
+          }
+
+          const remainingSeconds = Math.max(0, timer.duration - elapsedSeconds);
+          const display = document.getElementById(`timer-${timerId}`);
+          
+          if (display) {
+              display.textContent = formatTimeDisplay(remainingSeconds);
+              
+              if (remainingSeconds > 0 && timer.status === 'running') {
+                  activeTimers[timerId] = setTimeout(() => updateTimerDisplay(timerId, timer), 1000);
+              } else if (remainingSeconds <= 0) {
+                  display.textContent = "00:00";
+                  display.style.color = "red";
+                  playTimerCompleteSound();
+              }
+          }
+      }
+
+      function formatTimeDisplay(seconds) {
+          const minutes = Math.floor(seconds / 60);
+          const secs = seconds % 60;
+          return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+
+      function playTimerCompleteSound() {
+          try {
+              new Audio('/sounds/alarm.mp3').play();
+          } catch (error) {
+              console.error('Error playing sound:', error);
+          }
+      }
+
+      // Utility Functions
+      function showEmptyTimerState(message) {
+          const timersList = document.getElementById('timers-list');
+          timersList.innerHTML = `
+              <div class="empty-state">
+                  <p>${message}</p>
+                  <button class="btn browse-recipes">Browse Recipes</button>
+              </div>
+          `;
+          timersList.querySelector('.browse-recipes').addEventListener('click', openRecipeModal);
+      }
+
+      function handleFetchErrors(response) {
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+          return response.json();
+      }
+
+      function showAlert(message) {
+          alert(message);  // Could be replaced with a nicer UI notification
+      }
+  </script>
+</body>
+</html>

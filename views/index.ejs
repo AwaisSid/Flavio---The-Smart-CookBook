@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flaavio - Your Personalized Culinary Journey</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.css">
+    <link rel="stylesheet" href="/styles/dashboard.css">
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --dark: #292F36;
+            --light: #F7FFF7;
+            --accent: #FF9F1C;
+            --glass: rgba(255, 255, 255, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Hero Slider */
+        .hero-slider {
+            height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swiper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .swiper-slide {
+            background-position: center;
+            background-size: cover;
+            filter: blur(4px);
+            transform: scale(1.1);
+            transition: all 1s ease;
+        }
+
+        .swiper-slide-active {
+            filter: blur(0);
+            transform: scale(1);
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+        }
+
+        .hero-quote {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+            max-width: 900px;
+            line-height: 1.2;
+            font-style: italic;
+        }
+
+        .quote-author {
+            font-size: 1.5rem;
+            color: var(--light);
+            font-weight: 300;
+            margin-bottom: 3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: var(--glass);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Features Grid */
+        .features {
+            padding: 6rem 2rem;
+            background-color: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 5rem;
+            font-size: 3rem;
+            color: var(--dark);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 5px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s ease;
+            text-align: center;
+            border-top: 5px solid var(--primary);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+        }
+
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--dark);
+        }
+
+        .feature-desc {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Recipe Showcase */
+        .recipe-showcase {
+            padding: 6rem 2rem;
+            background-color: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .showcase-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .showcase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+
+        .showcase-title {
+            font-size: 2.5rem;
+            color: var(--dark);
+        }
+
+        .showcase-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .showcase-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            color: var(--dark);
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .showcase-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .recipe-carousel {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 2rem;
+        }
+
+        .recipe-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .recipe-carousel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .recipe-carousel::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .recipe-card {
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            scroll-snap-align: start;
+            position: relative;
+        }
+
+        .recipe-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        .recipe-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .recipe-img {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .recipe-content {
+            padding: 1.5rem;
+        }
+
+        .recipe-title {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: var(--dark);
+        }
+
+        .recipe-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-desc {
+            color: #666;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .recipe-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .view-btn {
+            padding: 0.6rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .view-btn:hover {
+            background: var(--dark);
+            transform: translateY(-2px);
+        }
+
+        /* Personalization Section */
+        .personalization {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            text-align: center;
+        }
+
+        .personalization-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .personalization-title {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .personalization-desc {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        .preference-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+
+        .preference-tag {
+            padding: 0.8rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .preference-tag:hover, .preference-tag.active {
+            background: white;
+            color: var(--primary);
+        }
+
+        /* Testimonials */
+.testimonials {
+    padding: 6rem 2rem;
+    background-color: white;
+}
+
+.testimonial-slider {
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.swiper-container {
+    padding: 2rem 1rem 4rem;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 3rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    margin: 0 auto;
+    max-width: 800px;
+    text-align: center;
+    position: relative;
+}
+
+.swiper-slide {
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.swiper-slide-active {
+    opacity: 1;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--primary);
+    background: rgba(255,255,255,0.8);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 1.5rem;
+}
+
+.swiper-pagination-bullet {
+    background: #ccc;
+    opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--primary);
+}
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 2rem;
+            background: url('/images/cta-bg.jpg') center/cover no-repeat;
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 1;
+        }
+
+        .cta-container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-desc {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            text-align: left;
+        }
+
+        .footer-column h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-quote {
+                font-size: 2.2rem;
+                padding: 0 1rem;
+            }
+            
+            .quote-author {
+                font-size: 1.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                width: 100%;
+                padding: 0 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .section-title {
+                font-size: 2.2rem;
+            }
+            
+            .feature-card {
+                padding: 2rem 1.5rem;
+            }
+            
+            .testimonial-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+        /* custom routing links ka styling hai  */
+        .feature-link {
+        text-decoration: none;
+        color: inherit;
+    }
+    .feature-link:hover h3 {
+        color: #4CAF50;
+        text-decoration: underline;
+    }
+    .feature-card {
+        transition: transform 0.3s;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    </style>
+</head>
+<body>
+    <%- include('partials/header', { user: user, currentPage: 'page-name' }) %>
+    <!-- Hero Slider with Blurred Background -->
+    <section class="hero-slider">
+        <div class="swiper">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" style="background-image: url('/images/slide1.jpg')"></div>
+                <div class="swiper-slide" style="background-image: url('/images/slide2.webp')"></div>
+                <div class="swiper-slide" style="background-image: url('/images/slide3.webp')"></div>
+            </div>
+        </div>
+        
+        <div class="hero-content">
+            <h1 class="hero-quote">"Cooking is an art, but all art requires knowing something about the techniques and materials"</h1>
+            <p class="quote-author">- Awais Siddiqui</p>
+            <div class="cta-buttons">
+                <a href="/recipes" style="text-decoration: none;" class="<%= typeof currentPage !== 'undefined' && currentPage === 'recipes' ? 'active' : '' %>" >
+                    <button class="btn btn-primary">
+                    <i class="fas fa-utensils"></i> Start Cooking
+                </button></a>
+              
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Grid - Showcasing All Modules -->
+    <section class="features">
+        <h2 class="section-title">Your Complete Kitchen Companion</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <a href="/profile" class="feature-link">
+                    <h3 class="feature-title">Your Profile</h3>
+                </a>
+                <p class="feature-desc">See dietary preferences, allergies, and skill level for tailored recipe recommendations.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <a href="/recipes" class="feature-link">
+                    <h3 class="feature-title">Recipe Database</h3>
+                </a>
+                <p class="feature-desc">Access thousands of recipes with advanced search and filtering options.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <a href="/recommendations" class="feature-link">
+                    <h3 class="feature-title">Smart Recommendations</h3>
+                </a>
+                <p class="feature-desc">Get personalized suggestions based on your tastes and cooking history.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <a href="/nutrition/planner" class="feature-link">
+                    <h3 class="feature-title">Nutrition Planner</h3>
+                </a>
+                <p class="feature-desc">Plan your Nutrition meals with our intuitive drag-and-drop interface.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-list-alt"></i>
+                </div>
+                <a href="/grocery" class="feature-link">
+                    <h3 class="feature-title">Grocery Generator</h3>
+                </a>
+                <p class="feature-desc">Automatically create shopping lists from your meal plans.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-compass"></i>
+                </div>
+                <a href="/discover" class="feature-link">
+                    <h3 class="feature-title">Recipe Discovery</h3>
+                </a>
+                <p class="feature-desc">Explore new cuisines and cooking techniques with our discovery engine.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-stopwatch"></i>
+                </div>
+                <a href="/cooking-timer" class="feature-link">
+                    <h3 class="feature-title">Cooking Timer</h3>
+                </a>
+                <p class="feature-desc">Multi-step timers that guide you through complex recipes.</p>
+            </div>
+            
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <a href="/favourites" class="feature-link">
+                    <h3 class="feature-title">Liked Recipes</h3>
+                </a>
+                <p class="feature-desc">CheckOut What You Have Liked!</p>
+            </div>
+        </div>
+    </section>
+    <!-- Personalized Recipe Recommendations -->
+    <section class="recipe-showcase">
+        <!-- In the Featured Recipes section
+<div class="recipe-carousel" id="recipe-carousel">
+    <% recipes.slice(0, 8).forEach(recipe => { 
+        const ingredients = JSON.parse(recipe.ingredients || '[]');
+        const tags = JSON.parse(recipe.tags || '[]');
+        const instructions = recipe.instructions || '';
+    %>
+        <div class="recipe-card">
+            <% if (recipe.cuisine) { %>
+                <div class="recipe-badge"><%= recipe.cuisine %></div>
+            <% } %>
+            
+            <img src="/images/<%= recipe.image_url || '/images/recipe-placeholder.jpg' %>" alt="<%= recipe.name || 'Unnamed recipe' %>" class="recipe-img">
+            
+            <div class="recipe-content">
+                <h3 class="recipe-title"><%= recipe.name || 'New Recipe' %></h3>
+                
+                <div class="recipe-meta">
+                    <span><i class="fas fa-clock"></i> 35 mins</span>
+                    <span><i class="fas fa-fire"></i> 450 cal</span>
+                </div>
+                
+                <p class="recipe-desc">
+                    <%= instructions.substring(0, Math.min(100, instructions.length)) %>
+                    <% if (instructions.length > 100) { %>...<% } %>
+                </p>
+                
+                <div class="recipe-footer">
+                    <a href="/recipes/<%= recipe.recipe_id %>" class="view-btn">View Recipe</a>
+                    <div class="recipe-actions">
+                        <i class="far fa-heart" title="Save to favorites"></i>
+                        <i class="far fa-calendar-plus" title="Add to meal plan"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %>
+</div> -->
+
+<!-- In the Recommended For You section
+<div class="recipe-carousel" id="recipe-carousel">
+    <% recipes.slice(0, 8).forEach(recipe => { 
+        const ingredients = JSON.parse(recipe.ingredients || '[]');
+        const tags = JSON.parse(recipe.tags || '[]');
+        const instructions = recipe.instructions || '';
+    %>
+        <div class="recipe-card">
+            <% if (recipe.cuisine) { %>
+                <div class="recipe-badge"><%= recipe.cuisine %></div>
+            <% } %>
+            
+            <img src="/images/<%= recipe.image_url || '/images/recipe-placeholder.jpg' %>" alt="<%= recipe.name || 'Unnamed recipe' %>" class="recipe-img">
+            
+            <div class="recipe-content">
+                <h3 class="recipe-title"><%= recipe.name || 'New Recipe' %></h3>
+                
+                <div class="recipe-meta">
+                    <span><i class="fas fa-clock"></i> 35 mins</span>
+                    <span><i class="fas fa-fire"></i> 450 cal</span>
+                </div>
+                
+                <p class="recipe-desc">
+                    <%= instructions.substring(0, Math.min(100, instructions.length)) %>
+                    <% if (instructions.length > 100) { %>...<% } %>
+                </p>
+                
+                <div class="recipe-footer">
+                    <a href="/recipes/<%= recipe.recipe_id %>" class="view-btn">View Recipe</a>
+                    <div class="recipe-actions">
+                        <i class="far fa-heart" title="Save to favorites"></i>
+                        <i class="far fa-calendar-plus" title="Add to meal plan"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% }); %> -->
+</div>
+    </section>
+
+    <!-- Personalization Section
+    <section class="personalization">
+        <div class="personalization-container">
+            <h2 class="personalization-title">Tell Us What You Love</h2>
+            <p class="personalization-desc">The more we know about your tastes, the better we can recommend recipes you'll love. Select your preferences below:</p>
+            
+            <div class="preference-tags">
+                <div class="preference-tag">Vegetarian</div>
+                <div class="preference-tag">Vegan</div>
+                <div class="preference-tag">Keto</div>
+                <div class="preference-tag">Gluten-Free</div>
+                <div class="preference-tag">Dairy-Free</div>
+                <div class="preference-tag">Low-Carb</div>
+                <div class="preference-tag">High-Protein</div>
+                <div class="preference-tag">Quick Meals</div>
+                <div class="preference-tag">Meal Prep</div>
+                <div class="preference-tag">Comfort Food</div>
+            </div>
+            
+            <button class="btn btn-primary" style="background: white; color: var(--primary);">
+                <i class="fas fa-magic"></i> Personalize My Experience
+            </button>
+        </div>
+    </section> -->
+
+    <!-- Testimonials Section -->
+<section class="testimonials">
+    <h2 class="section-title">What Our Community Says</h2>
+    
+    <div class="testimonial-slider">
+        <div class="swiper-container">
+            <div class="swiper-wrapper">
+                <!-- Testimonial 1 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">Flaavio has completely transformed how I cook. The personalized recommendations introduced me to flavors I never would have tried on my own.</p>
+                        <div class="testimonial-author">
+                            <img src="/images/testimonial1.jpg" alt="Sarah K." class="author-img">
+                            <div>
+                                <div class="author-name">IQRA SIDDIQUI</div>
+                                <div class="author-title">Home Cook</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">As a busy parent, the meal planner and grocery list generator have saved me hours each week. The recipes are family-friendly and delicious.</p>
+                        <div class="testimonial-author">
+                            <img src="/images/testimonial1.jpg" alt="Michael T." class="author-img">
+                            <div>
+                                <div class="author-name">Michael T.</div>
+                                <div class="author-title">Food Blogger</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="swiper-slide">
+                    <div class="testimonial-card">
+                        <p class="testimonial-text">The progress tracker helped me stay motivated on my health journey. I've lost 25 pounds while learning to cook nutritious meals.</p>
+                        <div class="testimonial-author">
+                            <img src="/images/testimonial1.jpg" alt="Lisa M." class="author-img">
+                            <div>
+                                <div class="author-name">Lisa M.</div>
+                                <div class="author-title">Fitness Enthusiast</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Add pagination -->
+            <div class="swiper-pagination"></div>
+            <!-- Add navigation buttons -->
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-container">
+            <h2 class="cta-title">Ready to Transform Your Cooking Experience?</h2>
+            <p class="cta-desc">Join thousands of home cooks who are discovering new flavors, saving time, and enjoying the process with Flaavio.</p>
+            <button class="btn btn-primary" style="padding: 1rem 3rem;">
+                <i class="fas fa-rocket"></i> Get Started Now
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <!-- Include footer -->
+    <%- include('partials/footer') %>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+    <script>
+        // Initialize Hero Slider
+        const heroSwiper = new Swiper('.hero-slider .swiper', {
+            effect: 'fade',
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false,
+            },
+            loop: true,
+        });
+        
+        // Initialize Testimonial Slider
+const testimonialSwiper = new Swiper('.testimonial-slider .swiper-container', {
+    slidesPerView: 1,
+    spaceBetween: 30,
+    loop: true,
+    centeredSlides: true,
+    autoplay: {
+        delay: 5000,
+        disableOnInteraction: false,
+    },
+    pagination: {
+        el: '.swiper-pagination',
+        clickable: true,
+    },
+    navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev',
+    },
+    breakpoints: {
+        768: {
+            slidesPerView: 1.2,
+        }
+    },
+    on: {
+        init: function () {
+            // Make sure active slide is fully visible
+            this.slides.forEach(slide => {
+                slide.style.opacity = '0.5';
+            });
+            this.slides[this.activeIndex].style.opacity = '1';
+        },
+        slideChange: function () {
+            // Update opacity on slide change
+            this.slides.forEach(slide => {
+                slide.style.opacity = '0.5';
+            });
+            this.slides[this.activeIndex].style.opacity = '1';
+        }
+    }
+});
+        
+        // Recipe Carousel Navigation
+        const carousel = document.getElementById('recipe-carousel');
+        const prevBtn = document.getElementById('prev-recipe');
+        const nextBtn = document.getElementById('next-recipe');
+        
+        nextBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            carousel.scrollBy({ left: -300, behavior: 'smooth' });
+        });
+        
+        // Preference Tag Selection
+        const tags = document.querySelectorAll('.preference-tag');
+        tags.forEach(tag => {
+            tag.addEventListener('click', () => {
+                tag.classList.toggle('active');
+            });
+        });
+        
+        // Animate elements when they come into view
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.feature-card, .recipe-card');
+            
+            elements.forEach(element => {
+                const elementPosition = element.getBoundingClientRect().top;
+                const screenPosition = window.innerHeight / 1.2;
+                
+                if (elementPosition < screenPosition) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        // Set initial state for animation
+        document.querySelectorAll('.feature-card, .recipe-card').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+        });
+        
+        window.addEventListener('scroll', animateOnScroll);
+        window.addEventListener('load', animateOnScroll);
+    </script>
+</body>
+</html>

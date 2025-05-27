@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= recipe.name %> | Flaavio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #FF6B6B;
+      --primary-light: #FF9E9E;
+      --secondary: #4ECDC4;
+      --dark: #292F36;
+      --light: #F7FFF7;
+      --accent: #FF9F1C;
+      --gray: #E0E0E0;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: #f9f9f9;
+    }
+    
+    /* Header Styles */
+    .recipe-header {
+      position: relative;
+      height: 70vh;
+      min-height: 500px;
+      overflow: hidden;
+      margin-bottom: 3rem;
+    }
+    
+    .recipe-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+      z-index: 1;
+    }
+    
+    .recipe-hero-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .recipe-header:hover .recipe-hero-image {
+      transform: scale(1.03);
+    }
+    
+    .recipe-title-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 3rem;
+      z-index: 2;
+      color: white;
+    }
+    
+    .recipe-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: 1rem;
+      font-weight: 700;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    }
+    
+    .recipe-description {
+      font-size: 1.2rem;
+      max-width: 800px;
+      margin-bottom: 2rem;
+      opacity: 0.9;
+    }
+    
+    .recipe-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+    }
+    
+    .meta-icon {
+      color: var(--primary-light);
+    }
+    
+    /* Main Content Layout */
+    .recipe-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 3rem;
+      margin-bottom: 4rem;
+    }
+    
+    /* Ingredients Section */
+    .ingredients-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      position: sticky;
+      top: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--dark);
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 3px;
+      background: var(--primary);
+    }
+    
+    .servings-control {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .servings-btn {
+      background: var(--gray);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .servings-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    
+   /* Updated Ingredients List Styles */
+.ingredients-list {
+  list-style: none;
+  padding-left: 0; /* Remove default padding */
+}
+
+.ingredient-item {
+  padding: 0.8rem 0 0.8rem 2.5rem; /* Adjust left padding */
+  border-bottom: 1px solid var(--gray);
+  position: relative; /* For absolute positioning of checkbox */
+  min-height: 40px; /* Ensure consistent height */
+}
+
+.ingredient-checkbox {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0; /* Remove default margin */
+}
+
+.ingredient-text {
+  display: block;
+  padding-left: 0.5rem; /* Space between checkbox and text */
+}
+    
+    /* Instructions Section */
+    .instructions-section {
+      margin-bottom: 3rem;
+    }
+    
+  /* Updated Instructions Section */
+.instructions-list {
+  counter-reset: step-counter;
+  list-style: none;
+  padding-left: 0;
+}
+
+.instruction-item {
+  counter-increment: step-counter;
+  margin-bottom: 2rem;
+  padding: 1.5rem 1.5rem 1.5rem 5rem; /* Increased left padding */
+  position: relative;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.instruction-item::before {
+  content: counter(step-counter);
+  position: absolute;
+  left: 1.5rem; /* Adjusted from 1rem */
+  top: 1.5rem;
+  width: 30px;
+  height: 30px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+    /* Nutrition & Tags */
+    .nutrition-card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+    }
+    
+    .nutrition-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    
+    .nutrition-item {
+      text-align: center;
+      padding: 1rem;
+      border-radius: 8px;
+      background: #f5f5f5;
+    }
+    
+    .nutrition-value {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 0.3rem;
+    }
+    
+    .nutrition-label {
+      font-size: 0.9rem;
+      color: #666;
+    }
+    
+    .tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    
+    .tag {
+      background: var(--secondary);
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    
+    .btn {
+      padding: 0.8rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      border: none;
+      font-size: 0.95rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #e05a5a;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+    
+    .btn-outline:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      .recipe-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .recipe-header {
+        height: 60vh;
+      }
+      
+      .ingredients-card {
+        position: static;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .recipe-header {
+        height: 50vh;
+        min-height: 400px;
+      }
+      
+      .recipe-title-container {
+        padding: 2rem;
+      }
+      
+      .recipe-meta {
+        gap: 1rem;
+      }
+      
+      .instruction-item {
+        padding-left: 2.5rem;
+      }
+      
+      .instruction-item::before {
+        left: 0.5rem;
+      }
+    }
+    
+
+    /* Recommended Recipes */
+.recommended-section {
+  padding: 3rem 0;
+  background: #f9f9f9;
+  border-top: 1px solid #eee;
+  margin-top: 4rem;
+}
+
+.recommended-section .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.recommended-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #292F36;
+  text-align: center;
+}
+
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.recommendation-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.recipe-image {
+  height: 180px;
+  overflow: hidden;
+}
+
+.recipe-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.recommendation-card:hover .recipe-image img {
+  transform: scale(1.05);
+}
+
+.recipe-info {
+  padding: 1.5rem;
+}
+
+.recipe-info h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  color: #292F36;
+}
+
+.recipe-meta {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.recipe-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background: #4ECDC4;
+  color: white;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 768px) {
+  .recommendations-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .recommendations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-in {
+      animation: fadeInUp 0.6s ease forwards;
+    }
+
+
+ /* Progress Buttons */
+.progress-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+}
+
+/* .progress-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.8rem;
+    border: 2px solid var(--gray);
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    color: var(--dark);
+} */
+
+/* .progress-btn:hover {
+    border-color: var(--primary-light);
+    background: rgba(255, 107, 107, 0.05);
+} */
+/* Like Button Styles */
+.like-button {
+  background: none;
+  border: orange solid 1mm;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.like-button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.like-button.active {
+  color: #ff6b6b;
+}
+
+/* Toast Notifications */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  border-radius: 4px;
+  color: white;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+.toast.success {
+  background: #4CAF50;
+}
+
+.toast.error {
+  background: #f44336;
+}
+
+/* Spinner Animation */
+.fa-spinner {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Share Dropdown Styles */
+.share-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.share-options {
+  display: none;
+  position: absolute;
+  background: white;
+  min-width: 180px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  z-index: 100;
+  bottom: 100%;
+  left: 0;
+  padding: 8px 0;
+}
+
+.share-options.show {
+  display: block;
+}
+.share-option {
+  width: 100%;
+  padding: 8px 16px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.share-option:hover {
+  background: #f5f5f5;
+}
+
+/* Platform-specific colors */
+.facebook-option {
+  color: #1877F2;
+}
+.twitter-option {
+  color: #1DA1F2;
+}
+.instagram-option {
+  background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 1000;
+}
+
+.toast.show {
+  opacity: 1;
+}
+  </style>
+</head>
+<body>
+  <%- include('partials/header', { user: user, currentPage: 'recipes' }) %>
+  
+  <!-- Recipe Hero Section -->
+  <header class="recipe-header">
+    <img src="/images/<%= recipe.image_url || '/images/recipe-hero-placeholder.jpg' %>" 
+         alt="<%= recipe.name %>" 
+         class="recipe-hero-image">
+    <div class="recipe-title-container">
+      <h1 class="recipe-title"><%= recipe.name %></h1>
+      <p class="recipe-description"><%= recipe.description || 'A delicious recipe that will delight your taste buds.' %></p>
+      
+      <div class="recipe-meta">
+        <div class="meta-item">
+          <i class="fas fa-clock meta-icon"></i>
+          <span>35 mins</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-utensils meta-icon"></i>
+          <span><%= recipe.difficulty || 'Medium' %> difficulty</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-flag meta-icon"></i>
+          <span><%= recipe.cuisine || 'International' %></span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-user-friends meta-icon"></i>
+          <span>Serves 4</span>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- Main Content -->
+  <div class="recipe-container">
+    <!-- Left Column - Instructions -->
+    <main>
+      <section class="instructions-section animate-in" style="animation-delay: 0.1s">
+        <h2 class="section-title">Cooking Instructions</h2>
+        <ol class="instructions-list">
+          <% if (Array.isArray(recipe.instructions)) { %>
+            <% recipe.instructions.forEach((step, index) => { %>
+              <li class="instruction-item animate-in" style="animation-delay: <%= 0.2 + (index * 0.1) %>s">
+                <%= step %>
+              </li>
+            <% }) %>
+          <% } else { %>
+            <!-- Fallback for string instructions -->
+            <% const steps = typeof recipe.instructions === 'string' ? 
+                 recipe.instructions.split('\n').filter(step => step.trim()) : 
+                 [recipe.instructions]; %>
+            <% steps.forEach((step, index) => { %>
+              <li class="instruction-item animate-in" style="animation-delay: <%= 0.2 + (index * 0.1) %>s">
+                <%= step %>
+              </li>
+            <% }) %>
+          <% } %>
+        </ol>
+      </section>
+
+      <section class="progress-section animate-in" style="animation-delay: 0.1s">
+        <h2 class="section-title">Recipe Actions</h2>
+        <div class="progress-actions">
+          <button id="like-btn" class="like-button">
+            <i class="far fa-heart"></i> Like
+          </button>
+        </div>
+      </section>
+      <!-- Notification Toast -->
+      <div id="progress-toast" class="progress-toast">
+        <div id="toast-message"></div>
+      </div>
+
+
+    </main>
+    
+    <!-- Right Column - Ingredients & Info -->
+    <aside>
+      <div class="ingredients-card animate-in" style="animation-delay: 0.2s">
+        <h2 class="section-title">Ingredients</h2>
+        
+        <div class="servings-control">
+          <button class="servings-btn" id="decrease-servings">-</button>
+          <span id="servings-count">4 servings</span>
+          <button class="servings-btn" id="increase-servings">+</button>
+        </div>
+        
+        <ul class="ingredients-list">
+          <% if (Array.isArray(recipe.ingredients)) { %>
+            <% recipe.ingredients.forEach((ingredient, index) => { %>
+              <li class="ingredient-item animate-in" style="animation-delay: <%= 0.3 + (index * 0.05) %>s">
+                <input type="checkbox" class="ingredient-checkbox" id="ingredient-<%= index %>">
+                <label for="ingredient-<%= index %>" class="ingredient-text">&nbsp;&nbsp;<%= ingredient %></label>
+              </li>
+            <% }) %>
+          <% } else { %>
+            <!-- Fallback for string ingredients -->
+            <% const ingredients = typeof recipe.ingredients === 'string' ? 
+                 recipe.ingredients.split(',').map(i => i.trim()) : 
+                 [recipe.ingredients]; %>
+            <% ingredients.forEach((ingredient, index) => { %>
+              <li class="ingredient-item animate-in" style="animation-delay: <%= 0.3 + (index * 0.05) %>s">
+                <input type="checkbox" class="ingredient-checkbox" id="ingredient-<%= index %>">
+                <label for="ingredient-<%= index %>" class="ingredient-text">&nbsp;&nbsp;<%= ingredient %></label>
+              </li>
+            <% }) %>
+          <% } %>
+        </ul>
+      </div>
+      
+      <div class="nutrition-card animate-in" style="animation-delay: 0.3s">
+        <h2 class="section-title">Nutrition Facts</h2>
+        <div class="nutrition-grid">
+          <div class="nutrition-item">
+            <div class="nutrition-value">320</div>
+            <div class="nutrition-label">Calories</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">12g</div>
+            <div class="nutrition-label">Protein</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">45g</div>
+            <div class="nutrition-label">Carbs</div>
+          </div>
+          <div class="nutrition-item">
+            <div class="nutrition-value">10g</div>
+            <div class="nutrition-label">Fat</div>
+          </div>
+        </div>
+      </div>
+      
+      <% if (recipe.tags && recipe.tags.length > 0) { %>
+        <div class="nutrition-card animate-in" style="animation-delay: 0.4s">
+          <h2 class="section-title">Recipe Tags</h2>
+          <div class="tags-container">
+            <% recipe.tags.forEach(tag => { %>
+              <span class="tag"><%= tag %></span>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+      
+      <div class="action-buttons animate-in" style="animation-delay: 0.5s">
+        <button class="btn btn-primary" id="print-recipe">
+          <i class="fas fa-print"></i> Print Recipe
+        </button>
+       
+          <!-- Share Dropdown Container -->
+          <div class="share-dropdown">
+            <button class="btn btn-outline" id="share-recipe">
+              <i class="fas fa-share-alt"></i> Share
+            </button>
+            <div class="share-options">
+              <button class="share-option facebook-option" data-platform="facebook">
+                <i class="fab fa-facebook"></i> Facebook
+              </button>
+              <button class="share-option twitter-option" data-platform="twitter">
+                <i class="fab fa-twitter"></i> Twitter
+              </button>
+              <button class="share-option instagram-option" data-platform="instagram">
+                <i class="fab fa-instagram"></i> Instagram
+              </button>
+              <button class="share-option" data-platform="copy">
+                <i class="fas fa-link"></i> Copy Link
+              </button>
+            </div>
+          </div>
+        </div>
+      
+        </div>
+      </div>
+    </aside>
+  </div>
+
+ <!-- Recommended Recipes Section -->
+<% if (recommendations && recommendations.length > 0) { %>
+  <section class="recommended-section">
+    <div class="container">
+      <h2>You Might Also Like</h2>
+      <div class="recommendations-grid">
+        <% recommendations.forEach(recipe => { %>
+          <div class="recommendation-card">
+            <a href="/recipes/<%= recipe.recipe_id %>">
+              <div class="recipe-image">
+                <img src="/images/<%= recipe.image_url || 'recipe-placeholder.jpg' %>" alt="<%= recipe.name %>">
+              </div>
+              <div class="recipe-info">
+                <h3><%= recipe.name %></h3>
+                <div class="recipe-meta">
+                  <span><i class="fas fa-clock"></i> <%= recipe.time || '30 mins' %></span>
+                  <span><i class="fas fa-utensils"></i> <%= recipe.difficulty || 'Medium' %></span>
+                </div>
+                <% if (recipe.tags && recipe.tags.length > 0) { %>
+                  <div class="recipe-tags">
+                    <% recipe.tags.slice(0, 3).forEach(tag => { %>
+                      <span class="tag"><%= tag %></span>
+                    <% }) %>
+                  </div>
+                <% } %>
+              </div>
+            </a>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+<% } %>
+
+
+  
+  <%- include('partials/footer') %>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 1. Servings adjustment
+      const servingsCount = document.getElementById('servings-count');
+      const decreaseBtn = document.getElementById('decrease-servings');
+      const increaseBtn = document.getElementById('increase-servings');
+      
+      let servings = 4;
+      
+      function updateServings() {
+        servingsCount.textContent = servings + ' serving' + (servings !== 1 ? 's' : '');
+      }
+      
+      decreaseBtn.addEventListener('click', () => {
+        if (servings > 1) {
+          servings--;
+          updateServings();
+        }
+      });
+      
+      increaseBtn.addEventListener('click', () => {
+        servings++;
+        updateServings();
+      });
+    
+      // 2. Ingredient checkboxes
+      const checkboxes = document.querySelectorAll('.ingredient-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const label = this.nextElementSibling;
+          if (this.checked) {
+            label.style.textDecoration = 'line-through';
+            label.style.opacity = '0.6';
+          } else {
+            label.style.textDecoration = 'none';
+            label.style.opacity = '1';
+          }
+        });
+      });
+    
+      // 3. Print functionality
+      document.getElementById('print-recipe').addEventListener('click', () => {
+        window.print();
+      });
+    
+      // 4. Share functionality
+      const shareDropdown = document.querySelector('.share-dropdown');
+      const shareOptions = document.querySelector('.share-options');
+      const shareRecipeBtn = document.getElementById('share-recipe');
+      const recipeUrl = window.location.href;
+      const recipeTitle = '<%= recipe.name %>';
+    
+      // Toggle dropdown
+      shareRecipeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        shareOptions.style.display = shareOptions.style.display === 'block' ? 'none' : 'block';
+      });
+    
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.share-dropdown')) {
+          shareOptions.style.display = 'none';
+        }
+      });
+    
+      // Share handlers
+      document.querySelectorAll('.share-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const platform = option.dataset.platform;
+          shareOptions.style.display = 'none';
+          
+          switch(platform) {
+            case 'facebook':
+              window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(recipeUrl)}`, '_blank');
+              break;
+            case 'twitter':
+              window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(recipeTitle)}&url=${encodeURIComponent(recipeUrl)}`, '_blank');
+              break;
+            case 'instagram':
+              window.open('https://www.instagram.com/', '_blank');
+              break;
+            case 'copy':
+              navigator.clipboard.writeText(recipeUrl);
+              showToast('Link copied to clipboard!', 'success');
+              break;
+          }
+        });
+      });
+    
+      // 5. Like button functionality
+      const likeBtn = document.getElementById('like-btn');
+      if (likeBtn) {
+        const recipeId = <%= recipe.recipe_id %>;
+        const userId = <%= user?.user_id || 'null' %>;
+    
+        // Check initial like status if user is logged in
+        if (userId) {
+          checkLikeStatus(recipeId, likeBtn);
+        } else {
+          likeBtn.disabled = true;
+          likeBtn.title = "Please login to like recipes";
+        }
+    
+        likeBtn.addEventListener('click', async function() {
+          if (!userId) return;
+          
+          const isLiked = likeBtn.classList.contains('liked');
+          likeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+          likeBtn.disabled = true;
+          
+          try {
+            const response = await fetch('/recipes/like-recipe', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ recipeId })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+              updateLikeButton(likeBtn, data.isLiked);
+              showToast(data.isLiked ? 'Added to favorites!' : 'Removed from favorites', 
+                      data.isLiked ? 'success' : 'info');
+            }
+          } catch (error) {
+            console.error('Like Error:', error);
+            showToast('Failed to update', 'error');
+          } finally {
+            if (userId) likeBtn.disabled = false;
+          }
+        });
+      }
+    
+      // 6. Animation observers
+      const animateElements = document.querySelectorAll('.animate-in');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.animationPlayState = 'running';
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      animateElements.forEach(el => {
+        el.style.opacity = '0';
+        observer.observe(el);
+      });
+    
+      // Helper functions
+      async function checkLikeStatus(recipeId, button) {
+        try {
+          const response = await fetch(`/recipes/check-like/${recipeId}`);
+          const data = await response.json();
+          if (data.isLiked) {
+            updateLikeButton(button, true);
+          }
+        } catch (err) {
+          console.error('Error checking like status:', err);
+        }
+      }
+    
+      function updateLikeButton(button, isLiked) {
+        button.classList.toggle('liked', isLiked);
+        button.innerHTML = isLiked 
+          ? '<i class="fas fa-heart"></i> Liked' 
+          : '<i class="far fa-heart"></i> Like';
+      }
+    
+      function showToast(message, type) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+          <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+          ${message}
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.classList.add('show');
+          setTimeout(() => {
+            toast.remove();
+          }, 3000);
+        }, 10);
+      }
+    });
+    </script>
+</body>
+</html>
