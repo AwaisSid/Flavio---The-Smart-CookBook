@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-pg-simple": "^10.0.0",
+    "ejs": "^3.1.10",
+    "electron-packager": "^17.1.2",
+    "express": "^4.21.2",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.18.1",
+    "mysql2": "^3.14.0",
+    "nodemon": "^3.1.9",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "version": "^0.1.2"
+  },
+  "devDependencies": {
+    "electron": "^35.0.3"
+  },
+  "main": "main.js"
+}

@@ -1,0 +1,19 @@
+<div class="recommendations">
+              <h3>Recommended Recipes</h3>
+              <% if (typeof recommendations !== 'undefined' && recommendations.length > 0) { %>
+                  <% recommendations.forEach(recipe => { %>
+                      <div class="recommendation-card" data-recipe-id="<%= recipe.recipe_id %>" 
+                           data-recipe-name="<%= recipe.name %>" 
+                           data-image-url="<%= recipe.image_url %>">
+                          <img src="<%= recipe.image_url %>" alt="<%= recipe.name %>">
+                          <div>
+                              <h4><%= recipe.name %></h4>
+                              <p><i class="far fa-clock"></i> <%= recipe.time %></p>
+                          </div>
+                      </div>
+                  <% }) %>
+              <% } else { %>
+                  <p class="no-recommendations">No recommendations available</p>
+              <% } %>
+          </div>
+        </div>
