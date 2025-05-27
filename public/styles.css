@@ -1,0 +1,10 @@
+/* Critical structural styles */
+.site-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.site-content {
+  flex: 1; /* This makes the content expand and push footer down */
+}
